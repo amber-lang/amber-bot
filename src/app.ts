@@ -25,7 +25,7 @@ client.on('interactionCreate', async interaction => {
         }
 
         // Run the bash command in an isolated Docker container
-        exec(`docker run --rm alpine sh -c "amber -e \\"${block}\\""`, (error, stdout, stderr) => {
+        exec(`docker run --rm amber-alpine sh -c "amber -e \\"${block}\\""`, (error, stdout, stderr) => {
             // Send the result back to the user
             if (error) {
                 interaction.reply(`Error:\n\`\`\`\n${stderr}\n\`\`\``);
