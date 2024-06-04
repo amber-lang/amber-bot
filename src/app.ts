@@ -23,7 +23,7 @@ client.on('interactionCreate', async interaction => {
 
     if (commandName === 'run') {
         sessions[user.id] = true;
-        await interaction.reply('Please enter your code block.');
+        await interaction.reply({ content: 'Please enter your code block.', ephemeral: true });
     }
 });
 
@@ -52,7 +52,11 @@ client.on('messageCreate', async message => {
                 if (error) {
                     message.reply(`Error:\n\`\`\`\n${stderr}\n\`\`\``);
                 } else {
-                    message.reply(`\`\`\`\n${stdout}\n\`\`\``);
+                    if (!stdout.length) {
+                        message.reply('No output.');
+                    } else {
+                        message.reply(`\`\`\`\n${stdout}\n\`\`\``);
+                    }
                 }
                 // Clean up the temporary file
                 fs.unlinkSync(tempFilePath);
