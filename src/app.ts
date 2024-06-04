@@ -1,6 +1,8 @@
 import { Client, Intents, CommandInteraction } from 'discord.js';
 import { exec } from 'child_process';
 import * as dotenv from 'dotenv';
+import fs from 'fs';
+import path from 'path';
 
 dotenv.config();
 
@@ -24,8 +26,17 @@ client.on('interactionCreate', async interaction => {
             return;
         }
 
+        // Write the block to a temporary file
+        const tempDir = path.join('~', 'amber-temp');
+        if (!fs.existsSync(tempDir)) {
+            fs.mkdirSync(tempDir);
+        }
+        const tempFilePath = path.join(tempDir, 'main.ab');
+        fs.writeFileSync(tempFilePath, block);
+
+
         // Run the bash command in an isolated Docker container
-        exec(`docker run --rm amber-alpine sh -c "amber -e \\"${block}\\""`, (error, stdout, stderr) => {
+        exec(`docker run --rm -v ${tempDir}:/scripts amber-alpine sh -c "amber /scripts/main.ab"`, (error, stdout, stderr) => {
             // Send the result back to the user
             if (error) {
                 interaction.reply(`Error:\n\`\`\`\n${stderr}\n\`\`\``);
