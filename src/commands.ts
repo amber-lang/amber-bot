@@ -8,11 +8,7 @@ dotenv.config();
 const commands = [
     new SlashCommandBuilder()
         .setName('run')
-        .setDescription('Run a code block using amber')
-        .addStringOption(option =>
-            option.setName('block')
-                .setDescription('The code block to run')
-                .setRequired(true))
+        .setDescription('Run a code block using amber'),
 ]
     .map(command => command.toJSON());
 
