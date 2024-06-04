@@ -1,14 +1,17 @@
-# Use a base image with shell capabilities
-FROM alpine:latest
+FROM alpine:latest as base
 
-# Install necessary packages
-RUN apk add --no-cache bash curl bc sed
+USER root
 
-# Create directory for amber
-RUN mkdir -p /opt
+RUN apk add --no-cache --update bc bash curl
+RUN adduser -D amber
 
-# Install amber (replace with actual installation command if different)
-RUN curl -s "https://raw.githubusercontent.com/Ph0enixKM/AmberNative/master/setup/install.sh" | bash
+WORKDIR /home/amber
 
-# Set default command to bash
-CMD ["bash"]
+USER amber
+
+RUN curl -s "https://raw.githubusercontent.com/Ph0enixKM/AmberNative/master/setup/install.sh" -o install.sh && \
+    bash ./install.sh --user && \
+    rm install.sh
+
+ENV PATH=$PATH:~/.local/bin
+ENV SHELL=/bin/bash
