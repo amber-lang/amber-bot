@@ -75,6 +75,14 @@ client.on('messageCreate', async message => {
                 // Clean up the temporary file
                 fs.unlinkSync(tempFilePath);
             });
+
+            setTimeout(() => {
+                exec(`docker stop ${containerName}`, (error, stdout, stderr) => {
+                    if (!error) {
+                        message.reply(`Execution time exceeded ${TIME} seconds and was stopped.`);
+                    }
+                });
+            }, TIME * 1000);
         } else {
             message.reply('Please provide a valid code block wrapped in triple backticks.');
         }
