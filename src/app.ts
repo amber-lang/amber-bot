@@ -56,8 +56,7 @@ client.on('messageCreate', async message => {
                 `-v ${tempDir}:/scripts:ro`,
                 '--user 1000:1000',
                 '--cpus=".5"',
-                '--memory="256m"',
-                '--storage-opt size=100m'
+                '--memory="256m"'
             ].join(' ');
 
             // Run the bash command in an isolated Docker container
