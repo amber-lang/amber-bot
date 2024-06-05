@@ -61,8 +61,9 @@ client.on('messageCreate', async message => {
 
             // Run the bash command in an isolated Docker container
             exec(`docker run ${cmdArgs} amber-alpine sh -c "sh -c 'sleep ${TIME} && killall -9 amber' & amber /scripts/main.ab"`, (error, stdout, stderr) => {
+                if (isStopped) return;
                 // Send the result back to the user
-                if (error && !isStopped) {
+                if (error) {
                     message.reply(`Error:\n\`\`\`\n${stderr}\n\`\`\``);
                 } else {
                     if (!stdout.length) {
