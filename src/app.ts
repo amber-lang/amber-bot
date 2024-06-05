@@ -51,8 +51,7 @@ client.on('messageCreate', async message => {
             const cmdArgs = [
                 `--name ${containerName}`,
                 '--rm',
-                '--stop-timeout 5',
-                '--stop-signal SIGTERM',
+                '--stop-signal SIGKILL',
                 `-v ${tempDir}:/scripts:ro`,
                 '--user 1000:1000',
                 '--cpus=".5"',
@@ -60,7 +59,7 @@ client.on('messageCreate', async message => {
             ].join(' ');
 
             // Run the bash command in an isolated Docker container
-            exec(`docker run ${cmdArgs} amber-alpine sh -c "amber /scripts/main.ab"`, (error, stdout, stderr) => {
+            exec(`docker run ${cmdArgs} amber-alpine sh -c "sh -c 'sleep ${TIME} && killall -9 amber' & amber /scripts/main.ab"`, (error, stdout, stderr) => {
                 // Send the result back to the user
                 if (error) {
                     message.reply(`Error:\n\`\`\`\n${stderr}\n\`\`\``);
