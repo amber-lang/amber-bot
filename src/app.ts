@@ -47,6 +47,7 @@ client.on('messageCreate', async message => {
             fs.writeFileSync(tempFilePath, block);
 
             const containerName = `amber_container_${Date.now()}`;
+            let isStopped = false;
 
             const cmdArgs = [
                 `--name ${containerName}`,
@@ -61,7 +62,7 @@ client.on('messageCreate', async message => {
             // Run the bash command in an isolated Docker container
             exec(`docker run ${cmdArgs} amber-alpine sh -c "sh -c 'sleep ${TIME} && killall -9 amber' & amber /scripts/main.ab"`, (error, stdout, stderr) => {
                 // Send the result back to the user
-                if (error) {
+                if (error && !isStopped) {
                     message.reply(`Error:\n\`\`\`\n${stderr}\n\`\`\``);
                 } else {
                     if (!stdout.length) {
@@ -77,6 +78,7 @@ client.on('messageCreate', async message => {
             });
 
             setTimeout(() => {
+                isStopped = true;
                 exec(`docker stop ${containerName}`, (error, stdout, stderr) => {
                     if (!error) {
                         message.reply(`Execution time exceeded ${TIME} seconds and was stopped.`);
