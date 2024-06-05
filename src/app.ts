@@ -48,14 +48,28 @@ client.on('messageCreate', async message => {
 
             const containerName = `amber_container_${Date.now()}`;
 
+            const cmdArgs = [
+                `--name ${containerName}`,
+                '--rm',
+                '--stop-timeout 5',
+                '--stop-signal SIGTERM',
+                `-v ${tempDir}:/scripts:ro`,
+                '--user 1000:1000',
+                '--cpus=".5"',
+                '--memory="256m"',
+                '--storage-opt size=100m'
+            ].join(' ');
+
             // Run the bash command in an isolated Docker container
-            exec(`docker run --name ${containerName} --rm -v ${tempDir}:/scripts amber-alpine sh -c "amber /scripts/main.ab"`, (error, stdout, stderr) => {
+            exec(`docker run ${cmdArgs} amber-alpine sh -c "amber /scripts/main.ab"`, (error, stdout, stderr) => {
                 // Send the result back to the user
                 if (error) {
                     message.reply(`Error:\n\`\`\`\n${stderr}\n\`\`\``);
                 } else {
                     if (!stdout.length) {
-                        message.reply('No output.');
+                        message.reply('_No output._');
+                    } else if (stdout.length > 1000) {
+                        message.reply(`\`\`\`\n${stdout.slice(0, 1000)}\n...\n\`\`\`\n_Output too long._`);
                     } else {
                         message.reply(`\`\`\`\n${stdout}\n\`\`\``);
                     }
@@ -63,17 +77,6 @@ client.on('messageCreate', async message => {
                 // Clean up the temporary file
                 fs.unlinkSync(tempFilePath);
             });
-
-            setTimeout(() => {
-                exec(`docker stop ${containerName}`, (error, stdout, stderr) => {
-                    if (error) {
-                        console.error(`Failed to stop container ${containerName}: ${stderr}`);
-                    } else {
-                        console.log(`Container ${containerName} stopped due to timeout.`);
-                        message.reply(`Execution time exceeded ${TIME} seconds and was stopped.`);
-                    }
-                });
-            }, TIME * 1000);
         } else {
             message.reply('Please provide a valid code block wrapped in triple backticks.');
         }
