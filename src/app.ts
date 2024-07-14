@@ -1,4 +1,4 @@
-import { Client, Intents, CommandInteraction } from 'discord.js';
+import { Client, Intents } from 'discord.js';
 import { exec } from 'child_process';
 import fs from 'fs';
 import path from 'path';
