@@ -1,10 +1,8 @@
-import { Client, Intents, CommandInteraction } from 'discord.js';
+import { Client, Intents } from 'discord.js';
 import { exec } from 'child_process';
-import * as dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
-
-dotenv.config();
+import 'dotenv/config'
 
 const sessions: { [key: string]: boolean } = {};
 const TIME = 5;
