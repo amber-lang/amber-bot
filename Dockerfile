@@ -1,13 +1,12 @@
 FROM alpine:latest
 
-RUN apk add --no-cache bc bash curl \
-    && adduser -D amber \
-    && su amber -c "cd ~ && curl -s https://raw.githubusercontent.com/Ph0enixKM/AmberNative/master/setup/install.sh -o install.sh && chmod +x install.sh && bash ./install.sh --user && rm install.sh"
+RUN apk add --no-cache bc bash curl
+RUN adduser -D amber
 
-USER amber
 WORKDIR /home/amber
+USER amber
+
+RUN bash -- <(curl -s "https://raw.githubusercontent.com/amber-lang/amber/master/setup/install.sh") --user
 
 ENV PATH="/home/amber/.local/bin:$PATH"
 ENV SHELL=/bin/bash
-
-CMD ["/bin/bash"]
