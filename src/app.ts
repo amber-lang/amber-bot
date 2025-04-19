@@ -36,15 +36,17 @@ client.on('messageCreate', async message => {
         if (codeBlockMatch) {
             const block = codeBlockMatch[1];
             const { version } = sessions[user.id];
+            const bashVersion = version || '5.2';
             delete sessions[user.id];
             const result = await startCodeRunner({
                 code: block,
                 lang: isBash ? 'bash' : 'amber',
-                version: version || '5.2'
+                version: bashVersion
             })
+            const response = (msg: string) => `-# language ${isBash ? '<:bashfile:1247579804434432061>' : '<:amber:1247579334701617302>'} |  bash version \`${bashVersion}\`\n${msg}`
             result.match(
-                (ok) => message.reply(ok),
-                (err) => message.reply(err)
+                (ok) => message.reply(response(ok)),
+                (err) => message.reply(response(err))
             );
         } else {
             message.reply('Please provide a valid code block wrapped in triple backticks.');
