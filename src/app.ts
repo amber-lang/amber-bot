@@ -1,11 +1,8 @@
 import { Client, Intents } from 'discord.js';
-import { exec } from 'child_process';
-import fs from 'fs';
-import path from 'path';
 import 'dotenv/config'
+import { BashVersion, startCodeRunner } from './runner';
 
-const sessions: { [key: string]: boolean } = {};
-const TIME = 5;
+const sessions: { [key: string]: { version?: BashVersion } } = {};
 
 const client = new Client({
     intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.MESSAGE_CONTENT]
@@ -18,11 +15,13 @@ client.once('ready', () => {
 client.on('interactionCreate', async interaction => {
     if (!interaction.isCommand()) return;
 
-    const { commandName, user } = interaction;
+    const { commandName, user, options } = interaction;
 
     if (commandName === 'run') {
-        sessions[user.id] = true;
-        await interaction.reply({ content: 'Please enter your code block.', ephemeral: true });
+        const version = options.getString('bash-version');
+        sessions[user.id] = { version: version as BashVersion };
+        const versionReply = version ? `Version ${version} selected. ` : '';
+        await interaction.reply({ content: versionReply + 'Please enter your code block.', ephemeral: true });
     }
 });
 
@@ -33,57 +32,20 @@ client.on('messageCreate', async message => {
     if (sessions[user.id]) {
         // Check if the message contains a code block
         const codeBlockMatch = content.match(/```(?:\w*\n)?([\s\S]*?)```/);
+        const isBash = /^```(bash|sh|shell)/.test(content);
         if (codeBlockMatch) {
-            const block = codeBlockMatch[1]; // Extract the code block content
+            const block = codeBlockMatch[1];
+            const { version } = sessions[user.id];
             delete sessions[user.id];
-            // Write the block to a temporary file
-            const tempDir = path.join(__dirname, 'amber-temp');
-            if (!fs.existsSync(tempDir)) {
-                fs.mkdirSync(tempDir);
-            }
-            const tempFilePath = path.join(tempDir, 'main.ab');
-            fs.writeFileSync(tempFilePath, block);
-
-            const containerName = `amber_container_${Date.now()}`;
-            let isStopped = false;
-
-            const cmdArgs = [
-                `--name ${containerName}`,
-                '--rm',
-                '--stop-signal SIGKILL',
-                `-v ${tempDir}:/scripts:ro`,
-                '--user 1000:1000',
-                '--cpus=".5"',
-                '--memory="256m"'
-            ].join(' ');
-
-            // Run the bash command in an isolated Docker container
-            exec(`docker run ${cmdArgs} amber-alpine sh -c "sh -c 'sleep ${TIME} && killall -9 amber' & amber /scripts/main.ab"`, (error, stdout, stderr) => {
-                if (isStopped) return;
-                // Send the result back to the user
-                if (error) {
-                    message.reply(`Error:\n\`\`\`\n${stderr}\n\`\`\``);
-                } else {
-                    if (!stdout.length) {
-                        message.reply('_No output._');
-                    } else if (stdout.length > 1000) {
-                        message.reply(`\`\`\`\n${stdout.slice(0, 1000)}\n...\n\`\`\`\n_Output too long._`);
-                    } else {
-                        message.reply(`\`\`\`\n${stdout}\n\`\`\``);
-                    }
-                }
-                // Clean up the temporary file
-                fs.unlinkSync(tempFilePath);
-            });
-
-            setTimeout(() => {
-                isStopped = true;
-                exec(`docker stop ${containerName}`, (error, stdout, stderr) => {
-                    if (!error) {
-                        message.reply(`Execution time exceeded ${TIME} seconds and was stopped.`);
-                    }
-                });
-            }, TIME * 1000);
+            const result = await startCodeRunner({
+                code: block,
+                lang: isBash ? 'bash' : 'amber',
+                version: version || '5.2'
+            })
+            result.match(
+                (ok) => message.reply(ok),
+                (err) => message.reply(err)
+            );
         } else {
             message.reply('Please provide a valid code block wrapped in triple backticks.');
         }
