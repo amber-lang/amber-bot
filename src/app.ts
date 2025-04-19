@@ -45,8 +45,8 @@ client.on('messageCreate', async message => {
             })
             const response = (msg: string) => `-# language ${isBash ? '<:bashfile:1247579804434432061>' : '<:amber:1247579334701617302>'} |  bash version \`${bashVersion}\`\n${msg}`
             result.match(
-                (ok) => message.reply(response(ok)),
-                (err) => message.reply(response(err))
+                (ok: string) => message.reply(response(ok)),
+                (err: string) => message.reply(response(err))
             );
         } else {
             message.reply('Please provide a valid code block wrapped in triple backticks.');
