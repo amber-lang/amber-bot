@@ -21,7 +21,10 @@ const commands = [
                 { name: '4.0', value: '4.0' },
                 { name: '3.2', value: '3.2' }
             )
-        )
+        ),
+    new SlashCommandBuilder()
+        .setName('help')
+        .setDescription('Show help information')
 ].map(command => command.toJSON());
 
 const rest = new REST({ version: '9' }).setToken(process.env.TOKEN ?? '');
