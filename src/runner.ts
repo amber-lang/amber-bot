@@ -27,6 +27,7 @@ export async function startCodeRunner({ code, lang, version = "5.2" }: CodeRunne
     const cmdArgs = [
         `--name ${containerName}`,
         '--rm',
+        '--network none',
         '--platform linux/amd64',
         '--stop-signal SIGKILL',
         `-v ${tempDir}:/scripts:ro`,
