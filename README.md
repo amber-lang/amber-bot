@@ -14,9 +14,9 @@ Amber Compiler bot that can run Amber code in the isolated environment.
 
 ## Requirements
 
-1. Build the `amber-alpine` Docker image.
+1. Build Docker images required for this bot.
 ```
-docker build -t amber-alpine .
+amber build.ab
 ```
 2. Register commands.
 ```

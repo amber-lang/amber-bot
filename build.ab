@@ -1,0 +1,9 @@
+let versions = ["5.2", "5.1", "5.0", "4.4", "4.3", "4.2", "4.1", "4.0", "3.2"]
+
+for version in versions {
+    echo ">>> BUILDING VERSION {version}"
+    $ docker build --build-arg BASE_BASH_IMAGE={version} -t amber-{version} . $ failed {
+        echo "Failed to build docker image"
+        break
+    }
+}

@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "ts-node src/app.ts",
+    "test-runner": "ts-node runner-test.ts",
     "register": "ts-node src/commands.ts"
   },
   "keywords": [],
@@ -14,6 +15,7 @@
     "@discordjs/rest": "^2.3.0",
     "discord.js": "^13.17.1",
     "dotenv": "^16.4.5",
+    "neverthrow": "^8.2.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
   },
