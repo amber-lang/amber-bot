@@ -14,7 +14,7 @@ interface CodeRunnerProps {
     version: BashVersion
 }
 
-export async function startCodeRunner({ code, lang, version = "5.2" }: CodeRunnerProps): Promise<Result<string, string>> {
+export async function startCodeRunner({ code, lang, version = "5.1" }: CodeRunnerProps): Promise<Result<string, string>> {
     // Write the block to a temporary file
     const tempDir = path.join(__dirname, 'amber-temp');
     if (!fs.existsSync(tempDir)) {
