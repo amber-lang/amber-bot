@@ -23,12 +23,14 @@ client.on('interactionCreate', async interaction => {
             sessions[user.id] = { version: version as BashVersion };
             const versionReply = version ? `Version ${version} selected. ` : '';
             await interaction.reply({ content: versionReply + 'Please enter your code block.', ephemeral: true });
+            break;
         }
         case 'help': {
             interaction.reply({ content: [
                 '`/run` - Executes Amber or Bash scripts in a custom Bash environment. After entering the command, paste your code inside a Markdown code block (triple backticks) and send it to run.',
                 '`/help` - Displays this message'
             ].join('\n'), ephemeral: true });
+            break;
         }
     }
 });
