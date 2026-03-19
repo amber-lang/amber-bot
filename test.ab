@@ -1,8 +1,0 @@
-let white = "\\033[47m"
-let red = "\\033[41m"
-let reset = "\\033[0m"
-
-main {
-  echo("${white} white text ${reset}")
-  echo("${red} red text ${reset}")
-}
